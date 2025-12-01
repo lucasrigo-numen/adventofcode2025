@@ -9,6 +9,8 @@ L1
 L99
 R14
 L82`
+,`L68
+L182`
  ,puzzleInput
 ]
 
@@ -52,11 +54,46 @@ var part1 = function() {
 var part2 = function () {
 
   for (let i = 0; i < input.length; i++) {
-    const numberStrings = input[i].split(/\s+/)
-    const numbers = numberStrings.map((val => {return Number(val)}))
+    const rotationStrings = input[i].split(/\s+/)
+    const rotations = rotationStrings.map((val => {
+      return {
+        direction: val.charAt(0),
+        distance: Number(val.slice(1))
+      }
+    }))
 
-    const result = 0
-    // console.log(result)
+    let dial = 50 // initial position
+    let zeroPosCount = 0
+
+    rotations.forEach(r => {
+      if (r.direction === 'L') {
+        const wasZero = dial === 0
+        dial -= r.distance
+        if (dial === 0) {
+          zeroPosCount++
+        } else if (dial < 0) {
+          dial = Math.abs(dial) // normalize to calculate
+          let over100 = Math.floor(dial / 100);
+          zeroPosCount += over100 + (wasZero ? 0 : 1);
+          dial = dial % 100 // remove over 100 digits
+          dial *= -1
+          dial = (dial + 100) % 100
+        }
+      } else {
+        dial += r.distance
+        const over100 = Math.floor(dial / 100);
+        zeroPosCount += over100;
+        dial %= 100
+      }
+      console.log(dial)
+    })
+
+    // 6281 too low
+    // 6268 too low
+    // 6291 too low
+    // 6295 correct
+    const result = zeroPosCount
+    console.log(result)
     $('#part2').append(input[i])
       .append('<br>&emsp;')
       .append(result)
